@@ -1,30 +1,35 @@
 import { Router } from 'express';
-import { parseISO } from 'date-fns';
+
+import { getCustomRepository } from 'typeorm';
 
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/CreateTransactionService';
-import DeleteTransactionService from '../services/DeleteTransactionService';
-import ImportTransactionsService from '../services/ImportTransactionsService';
+// import DeleteTransactionService from '../services/DeleteTransactionService';
+// import ImportTransactionsService from '../services/ImportTransactionsService';
 
 const transactionsRouter = Router();
 
 transactionsRouter.get('/', async (request, response) => {
-  // TODO
+  const transactionsRepository = getCustomRepository(TransactionsRepository);
+
+  const transactions = await transactionsRepository.find();
+  const balance = await transactionsRepository.getBalance();
+
+  return response.json({ transactions, balance });
 });
 
 transactionsRouter.post('/', async (request, response) => {
-  const { title, value, type, category, date } = request.body;
+  const { title, value, type, category } = request.body;
 
-  const parsedDate = parseISO(date);
+  const createTransaction = new CreateTransactionService();
 
-  // const createTransaction = new CreateTransactionService();
-
-  // const transaction = await createTransaction.execute({
-  //   date: parsedDate,
-  //   id,
-  // });
-
-  return response.json(title, value, type, category, parsedDate);
+  const transaction = await createTransaction.execute({
+    title,
+    value,
+    type,
+    category,
+  });
+  return response.json(transaction);
 });
 
 transactionsRouter.delete('/:id', async (request, response) => {

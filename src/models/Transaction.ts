@@ -16,9 +16,6 @@ class Transaction {
   id: string;
 
   @Column()
-  provider: string;
-
-  @Column()
   title: string;
 
   @Column('decimal')
